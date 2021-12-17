@@ -8,6 +8,7 @@ import com.anish.trust_fall.ExternalStorage.ExternalStorageCheck;
 import com.anish.trust_fall.MockLocation.MockLocationCheck;
 import com.anish.trust_fall.Rooted.RootedCheck;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -15,13 +16,28 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /** TrustFallPlugin */
-public class TrustFallPlugin implements MethodCallHandler {
+public class TrustFallPlugin implements MethodCallHandler,  FlutterPlugin{
   /** Plugin registration. */
 
   private final Context context;
+  private MethodChannel channel;
+  private FlutterPluginBinding binding;
+
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "trust_fall");
     channel.setMethodCallHandler(new TrustFallPlugin(registrar.context()));
+  }
+
+  @Override
+  public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+    channel = new MethodChannel(binding.getBinaryMessenger(), "trust_fall");
+    this.binding = binding;
+    channel.setMethodCallHandler(this);
+  }
+
+  @Override
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    channel.setMethodCallHandler(null);
   }
 
   private TrustFallPlugin(Context context){
